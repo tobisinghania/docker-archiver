@@ -1,4 +1,7 @@
 FROM docker.io/enchant/ubuntu
 
-COPY backupServer /backupServer
+COPY dist /workingDir
 
+WORKDIR /workingDir
+
+CMD ./backupServer

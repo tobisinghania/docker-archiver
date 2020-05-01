@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"os"
@@ -16,7 +17,7 @@ func main() {
 	r.POST("/backup", createBackup)
 	r.GET("/diskStats", getAvailableDiskSpace)
 	r.GET("/backups", listBackups)
-	r.Run("localhost:8888")
+	r.Run(fmt.Sprintf("0.0.0.0:%d", config.Port()))
 
 }
 

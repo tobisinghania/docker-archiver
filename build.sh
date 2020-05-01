@@ -1,0 +1,20 @@
+#!/bin/sh
+set -e
+
+echo "---------------------------------------------------------------------------"
+echo "Building backend"
+cd src
+go build -o ../dist/backupServer
+cd ..
+chmod +x ./dist/backupServer
+
+echo "Done"
+echo ""
+echo "---------------------------------------------------------------------------"
+echo "Building fontend"
+
+cd ui
+ng build --prod --outputPath ../dist/html
+
+echo "Done"
+echo ""

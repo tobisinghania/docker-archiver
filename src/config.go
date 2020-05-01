@@ -12,6 +12,7 @@ func init() {
 
 	viper.SetDefault("backupScript", "ls -alh")
 	viper.SetDefault("backupDir", "./backups")
+	viper.SetDefault("port", 8888)
 }
 
 func (conf *Config) BackupCmd() string {
@@ -20,6 +21,10 @@ func (conf *Config) BackupCmd() string {
 
 func (conf *Config) BackupDir() string {
 	return viper.GetString("backupDir")
+}
+
+func (conf *Config) Port() int32 {
+	return viper.GetInt32("port")
 }
 
 func (conf *Config) ListBackupsCmd() string {
