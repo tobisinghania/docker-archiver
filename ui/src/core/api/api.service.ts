@@ -12,36 +12,36 @@ export class ApiService {
   constructor(private httpClient: HttpClient) { }
 
   getVersion(): Observable<Version> {
-    return this.httpClient.get<Version>('/api/version');
+    return this.httpClient.get<Version>('api/version');
   }
 
 
   getDiskStats(): Observable<DiskStats> {
-    return this.httpClient.get<DiskStats>('/api/diskStats');
+    return this.httpClient.get<DiskStats>('api/diskStats');
   }
 
   getBackups(): Observable<Backup[]> {
-    return this.httpClient.get<Backup[]>('/api/backups');
+    return this.httpClient.get<Backup[]>('api/backups');
   }
 
   createBackup(): Observable<void> {
-    return this.httpClient.post<void>('/api/backups', {});
+    return this.httpClient.post<void>('api/backups', {});
   }
 
   downloadBackup(name: string) {
-    window.open("/static/backups/" + name, "blank")
+    window.open("static/backups/" + name, "blank")
   }
 
   deleteBackup(name: string): Observable<void> {
-    return this.httpClient.delete<void>('/api/backups/' + name)
+    return this.httpClient.delete<void>('api/backups/' + name)
   }
 
   restoreBackup(name: string): Observable<void> {
-    return this.httpClient.post<void>('/api/backups/restore/' + name, {})
+    return this.httpClient.post<void>('api/backups/restore/' + name, {})
   }
 
   postFile(fileToUpload: File): Observable<boolean> {
-    const endpoint = '/api/uploadBackup';
+    const endpoint = 'api/uploadBackup';
     const formData: FormData = new FormData();
     formData.append('file', fileToUpload, fileToUpload.name);
     return this.httpClient

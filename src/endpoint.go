@@ -19,7 +19,7 @@ func main() {
 	{
 
 		contextGroup.Static("/static/backups", config.BackupDir())
-		contextGroup.Use(static.Serve("/", static.LocalFile(config.UiDir(), false)))
+		r.Use(static.Serve("/backupManager", static.LocalFile(config.UiDir(), false)))
 
 		apiGroup := contextGroup.Group("/api")
 		{
