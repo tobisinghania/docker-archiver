@@ -13,7 +13,7 @@ import (
 func main() {
 
 	log.Printf("Backup script is %s", config.BackupCmd())
-	r := gin.New()
+	r := gin.Default()
 
 	r.Static("/static/backups", config.BackupDir())
 	r.Use(static.Serve("/", static.LocalFile(config.UiDir(), false)))
