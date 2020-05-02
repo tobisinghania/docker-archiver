@@ -17,5 +17,6 @@ RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24
     && add-apt-repository "deb [arch=amd64,arm64,ppc64el] http://mariadb.mirror.liquidtelecom.com/repo/10.4/ubuntu $(lsb_release -cs) main"
 
 RUN apt-get update && apt-get install -y mariadb-client
+RUN apt-get update && apt-get install -y zip
 
 CMD ./backupServer
