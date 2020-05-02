@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	"os"
 	"syscall"
 )
 
@@ -61,14 +60,7 @@ type Backup struct {
 func getAvailableDiskSpace(c *gin.Context) {
 
 	var stat syscall.Statfs_t
-
-	wd, err := os.Getwd()
-
-	if err != nil {
-		log.Printf("Error loading disk stats: %s", err)
-		c.JSON(500, c.Error(err))
-	}
-	syscall.Statfs(wd, &stat)
+	syscall.Statfs(config.BackupDir(), &stat)
 
 	stats := DiskStats{
 		TotalBytes:     stat.Blocks * uint64(stat.Bsize),

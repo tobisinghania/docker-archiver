@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {HttpClient, HttpEvent, HttpHeaders, HttpProgressEvent} from "@angular/common/http";
 import {Backup, DiskStats, Version} from "./models";
 import {Observable} from "rxjs";
-import {catchError, map} from "rxjs/operators";
+import {catchError, filter, map} from "rxjs/operators";
 
 @Injectable({
   providedIn: 'root'
@@ -40,14 +40,18 @@ export class ApiService {
     return this.httpClient.post<void>('api/backups/restore/' + name, {})
   }
 
-  postFile(fileToUpload: File): Observable<boolean> {
+  postFile(fileToUpload: File): Observable<{loaded: number, total: number}> {
     const endpoint = 'api/uploadBackup';
     const formData: FormData = new FormData();
     formData.append('file', fileToUpload, fileToUpload.name);
     return this.httpClient
-      .post(endpoint, formData, { headers: new HttpHeaders() })
+      .post(endpoint, formData, { headers: new HttpHeaders(), reportProgress: true, observe: "events" },)
       .pipe(
-        map(() => true),
+        filter(event => Object.getOwnPropertyNames(event).indexOf("loaded") >= 0),
+        map((event: HttpProgressEvent) => {
+          event = event as HttpProgressEvent;
+          return {loaded: event.loaded, total: event.total}
+        }),
         // catchError((e) => this.handleError(e));
       )
   }

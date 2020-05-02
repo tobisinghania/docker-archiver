@@ -1,17 +1,23 @@
-import {Component} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {ApiService} from "../core/api/api.service";
 import {BehaviorSubject, interval, Observable, of, throwError} from "rxjs";
 import {catchError, finalize, map, shareReplay, startWith, switchMap, tap} from "rxjs/operators";
 import {Backup, DiskStats} from "../core/api/models";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import { MatSort } from '@angular/material/sort';
+import {MatTableDataSource} from "@angular/material/table";
+import { MatPaginator } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit{
   title = 'backup-ui';
+
+  @ViewChild(MatSort, {static: false}) sort: MatSort;
+  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
 
   version$: Observable<string>;
   diskStats$: Observable<DiskStats>;
@@ -26,9 +32,22 @@ export class AppComponent {
   restoreBackupStatusMessage$ = new BehaviorSubject(null);
   restoreBackupState$ = new BehaviorSubject<'pending' | 'failed' | 'success'>(null);
 
+  uploadBackupButtonDisabled$ = new BehaviorSubject(false);
+  uploadBackupProgress$ = new BehaviorSubject<string>(null);
+
 
   fileToUpload: File = null;
   lastRestored: string;
+
+  dataSource: MatTableDataSource<Backup>;
+  ngOnInit() {
+    this.dataSource = new MatTableDataSource([]);
+    this.backups$.subscribe(it => {
+      this.dataSource.sort = this.sort;
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.data = it;
+    })
+  }
 
   constructor(private api: ApiService, private snackBar: MatSnackBar) {
     this.version$ = this.api.getVersion().pipe(
@@ -44,7 +63,8 @@ export class AppComponent {
 
     this.diskStatsPercentage$ = this.diskStats$.pipe(
       map(it =>
-        Math.round((it.availableBytes / it.totalBytes * 100 + Number.EPSILON) * 100) / 100 + '%')
+        this.toPercent(1.0 - it.availableBytes / it.totalBytes)
+      )
     )
 
     this.backups$ = interval(1000).pipe(startWith(0))
@@ -60,16 +80,30 @@ export class AppComponent {
     this.fileToUpload = files.item(0);
   }
 
+  toPercent(val: number) {
+    return Math.round((val * 100 + Number.EPSILON) * 100) / 100 + '%'
+  }
+
   uploadBackup() {
-    this.api.postFile(this.fileToUpload).subscribe(data => {
-      // do something, if upload success
+    this.uploadBackupButtonDisabled$.next(true);
+    this.uploadBackupProgress$.next('0%');
+    this.api.postFile(this.fileToUpload)
+      .pipe(
+        finalize(() => {
+          this.uploadBackupProgress$.next(null);
+          this.uploadBackupButtonDisabled$.next(false);
+        })
+      )
+      .subscribe(data => {
+        console.log("data", data)
+        this.uploadBackupProgress$.next(this.toPercent(data.loaded/data.total));
     }, error => {
       console.log(error);
     });
   }
 
   createNewBackup() {
-    this.createBackupStatusMessage$.next(false);
+    this.createBackupStatusMessage$.next("Creating backup...");
     this.createBackupButtonDisabled$.next(true);
     this.createBackupState$.next('pending')
     this.api.createBackup()

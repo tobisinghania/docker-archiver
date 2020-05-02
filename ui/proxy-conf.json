@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "http://localhost:8888/api",
+    "target": "http://localhost:8888/backupManager/api",
     "pathRewrite": {
       "^/api": ""
     },
@@ -8,7 +8,7 @@
     "secure": false
   },
   "/static/backups": {
-    "target": "http://localhost:8888/static/backups",
+    "target": "http://localhost:8888/backupManager/static/backups",
     "pathRewrite": {
       "^/static/backups": ""
     },
