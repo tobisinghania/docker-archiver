@@ -13,7 +13,7 @@ import (
 func main() {
 
 	log.Printf("Backup script is %s", config.BackupCmd())
-	r := gin.Default()
+	r := gin.New()
 
 	contextGroup := r.Group("/backupManager")
 	{
