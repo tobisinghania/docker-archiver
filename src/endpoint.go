@@ -15,18 +15,23 @@ func main() {
 	log.Printf("Backup script is %s", config.BackupCmd())
 	r := gin.Default()
 
-	r.Static("/static/backups", config.BackupDir())
-	r.Use(static.Serve("/", static.LocalFile(config.UiDir(), false)))
-
-	apiGroup := r.Group("/api")
+	contextGroup := r.Group("/backupManager")
 	{
-		apiGroup.POST("/backups", createBackup)
-		apiGroup.POST("/backups/restore/:backupName", restoreBackup)
-		apiGroup.GET("/diskStats", getAvailableDiskSpace)
-		apiGroup.GET("/backups", listBackups)
-		apiGroup.GET("/version", getVersion)
-		apiGroup.DELETE("/backups/:backupName", deleteBackup)
-		apiGroup.POST("/uploadBackup", uploadBackup)
+
+		contextGroup.Static("/static/backups", config.BackupDir())
+		contextGroup.Use(static.Serve("/", static.LocalFile(config.UiDir(), false)))
+
+		apiGroup := contextGroup.Group("/api")
+		{
+			apiGroup.POST("/backups", createBackup)
+			apiGroup.POST("/backups/restore/:backupName", restoreBackup)
+			apiGroup.GET("/diskStats", getAvailableDiskSpace)
+			apiGroup.GET("/backups", listBackups)
+			apiGroup.GET("/version", getVersion)
+			apiGroup.DELETE("/backups/:backupName", deleteBackup)
+			apiGroup.POST("/uploadBackup", uploadBackup)
+		}
+
 	}
 
 	r.Run(fmt.Sprintf("0.0.0.0:%d", config.Port()))
