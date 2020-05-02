@@ -1,0 +1,56 @@
+mat-drawer-container {
+  height: 100%;
+}
+
+
+// Sidenav left
+$mat-drawer-left-padding-bottom: 50px;
+
+mat-drawer {
+  padding-top: $mat-drawer-left-padding-bottom;
+  padding-left: 15px;
+  padding-right: 15px;
+  background-color: lightgray;
+}
+
+.sidenav-left {
+  height: calc(100% - #{$mat-drawer-left-padding-bottom});
+  display: flex;
+  flex-direction: column;
+}
+
+.sidenav-content {
+  flex: 1;
+}
+
+.sidenav-footer {
+  list-style: none;
+  padding-inline-start: 0;
+}
+
+
+// Main container
+.main-container {
+  padding-top: $mat-drawer-left-padding-bottom;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.failed {
+  color: red;
+}
+
+.success {
+  color: green;
+}
+
+.action {
+  cursor: pointer;
+}
+
+
+.toolbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}

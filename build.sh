@@ -14,7 +14,7 @@ echo "--------------------------------------------------------------------------
 echo "Building fontend"
 
 cd ui
-ng build --prod --outputPath ../dist/html
+ng build --prod --outputPath ../dist/html --base-href /backupManager/
 
 echo "Done"
 echo ""

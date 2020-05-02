@@ -1,20 +1,100 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to {{ title }}!
-  </h1>
-  <img width="300" alt="Angular Logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
-</div>
-<h2>Here are some links to help you start: </h2>
-<ul>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://github.com/angular/angular-cli/wiki">CLI Documentation</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
-  </li>
-</ul>
+<mat-drawer-container  class="drawer" autosize>
+  <mat-drawer mode="side" opened>
+    <div class="sidenav-left">
+
+      <div class="sidenav-content">Backup Manager</div>
+
+      <ul class="sidenav-footer">
+        <li>Diskspace</li>
+        <li *ngIf="diskStats$ | async as stats">{{stats.availableBytes | dsFileSize}}/{{stats.totalBytes | dsFileSize}}</li>
+        <li>{{diskStatsPercentage$ | async}}</li>
+        <li>----</li>
+        <li>Version {{version$ | async}}</li>
+      </ul>
+    </div>
+  </mat-drawer>
+
+
+  <mat-drawer-content>
+    <div class="main-container">
+
+
+
+
+      <div class="toolbar">
+        <button [disabled]="createBackupButtonDisabled$ | async" (click)="createNewBackup()" mat-raised-button>Create new backup</button>
+        <span *ngIf="createBackupState$ | async as state" [class]="state">
+          {{createBackupStatusMessage$ | async}}
+        </span>
+
+        <div class="form-group">
+          <input type="file"
+                 id="file"
+                 (change)="handleFileInput($event.target.files)">
+          <button [disabled]="!fileToUpload" (click)="uploadBackup()" mat-raised-button>Upload</button>
+        </div>
+      </div>
+
+      <div *ngIf="backups$ | async as backups; else noBackups">
+        <div *ngIf="backups.length >0; else noBackups">
+
+
+          <table mat-table [dataSource]="backups" style="width: 100%">
+            <!-- Position Column -->
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef> Name</th>
+              <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+            </ng-container>
+
+            <!-- Name Column -->
+            <ng-container matColumnDef="size">
+              <th mat-header-cell *matHeaderCellDef> Size </th>
+              <td mat-cell *matCellDef="let element"> {{element.sizeBytes}} </td>
+            </ng-container>
+
+            <!-- Restore State Column -->
+            <ng-container matColumnDef="log">
+              <th mat-header-cell *matHeaderCellDef>  </th>
+              <td mat-cell *matCellDef="let element">
+                <span *ngIf="lastRestored === element.name">
+                  <span [class]="restoreBackupState$ | async">{{restoreBackupStatusMessage$ | async}}</span>
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Name Column -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef> </th>
+              <td mat-cell *matCellDef="let element">
+
+                <button (click)="downloadBackup(element.name)" mat-icon-button color="primary" aria-label="Download">
+                  <mat-icon>get_app</mat-icon>
+                </button>
+
+                <button (click)="deleteBackup(element.name)" mat-icon-button color="primary" aria-label="Delete">
+                  <mat-icon>delete</mat-icon>
+                </button>
+
+                <button [disabled]="restoreBackupButtonDisabled$ | async"
+                    (click)="restoreBackup(element.name)" mat-icon-button color="primary" aria-label="Restore">
+                  <mat-icon>publish</mat-icon>
+                </button>
+
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="['name', 'size', 'log', 'actions']"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['name', 'size', 'log', 'actions'];"></tr>
+          </table>
+
+        </div>
+      </div>
+      <ng-template #noBackups>
+        No backups there
+      </ng-template>
+
+    </div>
+  </mat-drawer-content>
+</mat-drawer-container>
+
 
